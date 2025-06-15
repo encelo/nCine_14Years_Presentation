@@ -105,6 +105,12 @@ layout: cover
 </figure>
 </div>
 
+<!-- When updating this presentation, remember to:
+  - Update the Slidev version in `package.json`
+  - Refresh the `cloc` output (lines of code statistics)
+  - Regenerate the Git history graphs
+-->
+
 ---
 
 ## What Is the nCine? ⚙️
@@ -119,7 +125,8 @@ layout: cover
 - Based on a transformation scene graph and a node hierachy (no components)
 - A _learning opportunity_, both for me and for its users
 
-<!-- But not everything is a node like in Godot. -->
+<!-- But not everything is a node like in Godot.<br/>
+Linking the static or dynamic version of the library has implications on the exposed API. -->
 
 ---
 
@@ -266,7 +273,7 @@ Calculating my age is left as an exercise for the reader. 👴
 - I daydreamed about graphics and engine programming...
   - ...but what I actually did all day was GUI work for games 😞
 - I took destiny into my own hands! 💪
-  -  First "_encine2d_" commit on 19 June 2011 🗓️ (<carbon-commit /> [6bf318de](https://github.com/nCine/nCine/commit/6bf318de))
+  - First "_encine2d_" commit on 19 June 2011 🗓️ (<carbon-commit /> [6bf318de](https://github.com/nCine/nCine/commit/6bf318de))
   - Coming from CVS and SVN, I initially chose Mercurial and hosted on BitBucket
 - I deliberately neglected rendering to focus on everything else that makes an "engine"
 - I wrote "apptests" to stress-test the API as it evolved
@@ -813,7 +820,7 @@ RenderDoc showing degenerate vertices from <a href="https://github.com/nCine/nCi
 routeAlias: nctl
 ---
 
-## 💊 2018 - nCine Template Library (1/3)
+## 💊 2018 - nCine Template Library (1/4)
 
 - Arrays, atomics, hash functions, hashmaps, hashsets, lists, unique/shared pointers, sparse sets, strings
   - Most components are unit tested and benchmarked against the STL
@@ -847,7 +854,7 @@ From <a href="https://github.com/nCine/nCine/blob/master/include/nctl/type_trait
 
 ---
 
-## 💊 2018 - nCine Template Library (2/3)
+## 💊 2018 - nCine Template Library (2/4)
 
 <figure>
 
@@ -893,7 +900,7 @@ From <a href="https://github.com/nCine/nCine/blob/master/include/nctl/utility.h"
 
 ---
 
-## 💊 2018 - nCine Template Library (3/3)
+## 💊 2018 - nCine Template Library (3/4)
 
 <br/>
 <figure>
@@ -921,6 +928,41 @@ inline int distance(ForwardIterator &first, const ForwardIterator &last, Forward
 <figcaption class="left">
 Tag dispatching uses function overloading to choose the best implementation based on iterator type at compile time.<br/>
 From <a href="https://github.com/nCine/nCine/blob/master/include/nctl/iterator.h"><code>include/nctl/iterator.h</code> 🔗</a>
+</figcaption>
+</figure>
+
+---
+
+## 💊 2018 - nCTL: Smart Pointer Internals (4/4)
+
+- STL and nCTL smart pointers use the same memory as a raw pointer
+  - They rely on a compressed pair to store the pointer and its custom deleter
+  - Thanks to the _Empty Base Optimization_, a stateless deleter doesn't take up space
+  - nCTL includes a <a href="https://github.com/nCine/nCine/blob/master/unit_tests/gtest_uniqueptr.cpp">unit test</a> to verify there's no memory overhead
+
+<figure>
+
+```cpp
+/// Simple pair implementation for pointer and deleter
+template <class T1, class T2, bool value> struct PairImpl
+{
+    T1 first;
+    T2 second;
+    // ....
+};
+
+/// Specialization for empty second type
+template <class T1, class T2> struct PairImpl<T1, T2, true>
+{
+    T1 first;
+    // ...
+};
+
+template <class T1, class T2> using Pair = PairImpl<T1, T2, isEmpty<T2>::value>;
+```
+
+<figcaption>
+Compressed pair implementation with <code>isEmpty</code> type trait to enable EBO (<a href="https://github.com/nCine/nCine/blob/master/include/nctl/UniquePtr.h"><code>include/nctl/UniquePtr.h</code> 🔗</a>)
 </figcaption>
 </figure>
 
@@ -984,7 +1026,7 @@ routeAlias: sso
 ```cpp
 class String
 {
-// ...
+  // ...
   private:
     static const unsigned int SmallBufferSize = 16;
 
@@ -1494,7 +1536,7 @@ routeAlias: continuous_integration
 - One YAML script per supported platform in `.github/workflows/`
 - Projects upload a build artifact in the `projectName-artifacts` repository
   - This special repository has a branch per platform/compiler combination
-- The `nCine` workflow also builds and uploads the documentations (C++ and Lua)
+- The `nCine` workflow also runs the unit tests and builds the documentation (C++ and Lua)
 - The matrix of reproducible build combinations is impossible to manually test
 
 <br/>
@@ -1506,67 +1548,44 @@ routeAlias: continuous_integration
 
 ```mermaid {look: 'handDrawn', scale: 0.45}
 block-beta
-  block: platforms
+  block: platforms_compilers
     columns 1
-    title1["<strong>Platform</strong>"]
-    platform1("Linux")
-    space
-    platform2("Windows")
-    space
-    platform3("MinGW")
-    space
-    platform4("macOS 13")
-    platform5("macOS 14")
-    platform6("Android v7a")
-    platform7("Android v8a")
-    platform8("Android x86_64")
-    platform9("Emscripten")
-  end
-
-  block: compilers
-  columns 1
-    title2["<strong>Compiler</strong>"]
-    compiler1("GCC")
-    compiler2("Clang")
-    compiler3("Visual Studio 2019")
-    compiler4("Visual Studio 2022")
-    compiler5("GCC")
-    compiler6("Clang")
-    compiler7("Apple Clang")
-    compiler8("Apple Clang")
-    compiler9("Clang")
-    compiler10("Clang")
-    compiler11("Clang")
-    compiler12("Clang")
+    title1["<strong>Platform / Compiler</strong>"]
+    combination1("Linux / GCC")
+    combination2("Linux / Clang")
+    combination3("Windows / Visual Studio 2022")
+    combination4("MinGW / GCC")
+    combination5("MinGW / Clang")
+    combination6("macOS 13 / Apple Clang")
+    combination7("macOS 15 / Apple Clang")
+    combination8("Android v7a / Clang")
+    combination9("Android v8a / Clang")
+    combination10("Android x86_64 / Clang")
+    combination11("Emscripten / Clang")
   end
 
   space
 
   block: builds
     columns 1
-    title3["<strong>Build</strong>"]:1
-    space
+    title2["<strong>Build</strong>"]:1
     space
     build1("Release")
     space
-    space
     build2("Debug")
     space
-    space
     build3("DevDist")
-    space
     space
     build4("LuaDist")
   end
 
-  compilers --> build1
-  compilers --> build2
-  compilers --> build3
-  compilers --> build4
+  platforms_compilers --> build1
+  platforms_compilers --> build2
+  platforms_compilers --> build3
+  platforms_compilers --> build4
 
   style title1 stroke:#666,stroke-width:4px
   style title2 stroke:#666,stroke-width:4px
-  style title3 stroke:#666,stroke-width:4px
 ```
 
 <figcaption>The combinations matrix</figcaption>
@@ -1574,7 +1593,7 @@ block-beta
 </div>
 
 <div>
-<figure class="w-[85%]">
+<figure class="w-[95%]">
 <img src="/img/ncPong_artifact_branches.png" alt="ncPong artifact branches" />
 <figcaption>
 All the <a href="https://github.com/nCine/ncPong-artifacts/branches/all">branches</a> of the <code>ncPong-artifacts</code> repository
@@ -1785,6 +1804,8 @@ encelo@zephyrus ~/nCine $ cmake -S ncPong -B ncPong-build -D nCine_DIR=$PWD/nCin
 
 <figcaption>Example of CMake invocation to build the <strong>ncPong</strong> example game</figcaption>
 </figure>
+
+<!-- CMake also sets up compiler flags for debugging tools like sanitizers or the GNU profiler. -->
 
 ---
 
@@ -2385,13 +2406,13 @@ Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/appte
 ## 📸 2025 - Wet Paper
 
 - The GGJ game is still in development and will be a new showcase for users
-  - With custom shaders, statistics, load/save settings in TOML format, joystick vibration
+  - With custom shaders, statistics, load/save settings in TOML format, music, joystick vibration
   - A dogfooding experience to make nCine better (remember the Blender Open Movies?) 🐶
 
 <figure class="w-[70%]">
 <img src="/img/WetPaper.png" alt="Wet Paper" />
 <figcaption>
-<a href="https://github.com/encelo/wetpaper"><strong>Wet Paper</strong></a> with the custom refraction shader for bubbles
+<a href="https://github.com/encelo/wetpaper"><strong>Wet Paper</strong></a> with the custom <a href="https://blog.maximeheckel.com/posts/refraction-dispersion-and-other-shader-light-effects/">refraction shader</a> for bubbles
 </figcaption>
 </figure>
 
