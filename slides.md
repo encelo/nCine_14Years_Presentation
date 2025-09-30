@@ -5,7 +5,7 @@ titleTemplate: '%s – Open Source 2D Game Framework'
 info: |
   A 14-year journey developing nCine, an open-source 2D game framework.
   This talk covers its origins, the challenges of staying motivated over the long term, and the hurdles of open-sourcing a personal project while working in the game industry.
-  Along the way, it’s packed with juicy technical pills to whet the appetite of the most curious developers.
+  Along the way, it's packed with juicy technical pills to whet the appetite of the most curious developers.
 author: Angelo "encelo" Theodorou
 date: 05/06/2025
 keywords: nCine,open-source,cross-platform,2D,game framework,game development,C++,indie dev
@@ -39,6 +39,10 @@ layout: cover
 ### Angelo "encelo" Theodorou
 
 #### [/dev/games](https://devgames.org/), Rome, June 5-6, 2025
+
+<div class="absolute left-2/3 top-3/5" style="rotate: 25deg;font-size: small;">
+✨ Updated! ✨
+</div>
 
 <RenderWhen context="print">
   <template #fallback>
@@ -99,6 +103,12 @@ layout: cover
 </div>
 
 <div class="absolute left-1/24 top-1/15">
+<figure class="w-35">
+<img src="/img/ncine_icon_1024.png" alt="nCine logo">
+</figure>
+</div>
+
+<div class="absolute left-1/24 top-10/15">
 <figure class="w-35">
 <img src="/img/ncine_website_qr.png" alt="https://ncine.github.io - QR code">
 <figcaption><a href="https://ncine.github.io">https://ncine.github.io</a></figcaption>
@@ -222,24 +232,24 @@ Linking the static or dynamic version of the library has implications on the exp
 /-------------------------------------------------------------------------------\
 |Language                     files          blank        comment           code|
 |-------------------------------------------------------------------------------|
-|C++                            378          17127           3298          83956|
-|C/C++ Header                   343           7422           4277          30650|
-|CMake                           44            716            387           5676|
-|YAML                             7            176             27            923|
-|XML                              2              0              1            660|
+|C++                            394          18410           3661          90416|
+|C/C++ Header                   353           7828           4478          32213|
+|CMake                           47            756            431           6078|
+|YAML                             7            173             28            901|
 |Lua                             10            137              5            600|
 |GLSL                            21             67              0            340|
 |Markdown                         1             18              0             87|
 |Gradle                           2              1              0             23|
 |INI                              1              2              0             10|
+|XML                              1              0              0              5|
 |-------------------------------------------------------------------------------|
-|SUM:                           809          25666           7995         122925|
+|SUM:                           837          27392           8603         130673|
 \-------------------------------------------------------------------------------/
 ```
 
 <figcaption class="left">
-The main <strong>nCine</strong> repository, counting only the <code>master</code> branch and excluding external projects as of June 4, 2025.<br/>
-Over 25,000 lines are dedicated to unit tests. <span style="font-style: normal;">😱</span>
+The main <strong>nCine</strong> repository, counting the <code>job_system</code> branch and excluding external projects as of September 29, 2025.<br/>
+Over 26,000 lines are dedicated to unit tests. <span style="font-style: normal;">😱</span>
 </figcaption>
 </figure>
 
@@ -435,6 +445,7 @@ routeAlias: monotonic
 ## 💊 2013 - Monotonic Clocks
 
 <figure>
+
 ```cpp{*}{class:'!children:text-xs'}
 #if defined(_WIN32)
     if (hasPerfCounter_) QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER *>(&counter));
@@ -460,6 +471,7 @@ routeAlias: monotonic
     }
 #endif
 ```
+
 <figcaption>
 Three different backends, each one with a fallback (<a href="https://github.com/nCine/nCine/blob/master/src/base/Clock.cpp"><code>src/base/Clock.cpp</code>🔗</a>)
 </figcaption>
@@ -664,7 +676,7 @@ routeAlias: cpp11
 routeAlias: gl33_renderer
 ---
 
-## 💊 2018 - OpenGL 3.3 Renderer (1/2)
+## 💊 2018 - OpenGL 3.3 Renderer (1/4)
 
 - Update to OpenGL 3.3 Core Profile and OpenGL ES 3.0
   - `KHR_debug` extension (`glDebugMessageCallback()`, `glPushDebugGroup()`, `glObjectLabel()`)
@@ -694,7 +706,7 @@ From <a href="https://github.com/nCine/nCine/blob/master/src/graphics/RenderBatc
 
 ---
 
-## 💊 2018 - OpenGL 3.3 Renderer (2/2)
+## 💊 2018 - OpenGL 3.3 Renderer (2/4)
 
 <figure>
 
@@ -731,6 +743,110 @@ The vertex shader used by the <code>Sprite</code> class (<a href="https://github
 </figure>
 
 <!-- If the sprite has no attached texture, a simpler shader is used instead. -->
+
+---
+
+## 💊 2018 - OpenGL 3.3 Renderer (3/4)
+
+<div grid="~ cols-5">
+
+<div class="col-span-3">
+<figure>
+
+```cpp
+void RenderVaoPool::bindVao(const GLVertexFormat &vertexFormat)
+{
+    bool vaoFound = false;
+    for (VaoBinding &binding : vaoPool_)
+    {
+        if (binding.format == vertexFormat)
+        {
+            vaoFound = true;
+            const bool bindChanged = binding.object->bind();
+            binding.lastBindTime = TimeStamp::now();
+            break;
+        }
+    }
+
+    if (vaoFound == false)
+    {
+      unsigned int index = 0;
+      if (vaoPool_.size() < vaoPool_.capacity())
+      {
+          vaoPool_.emplaceBack();
+          vaoPool_.back().object =
+              nctl::makeUnique<GLVertexArrayObject>();
+          index = vaoPool_.size() - 1;
+      }
+```
+
+<figcaption>
+The first part of the <code>bindVao()</code> method (<a href="https://github.com/nCine/nCine/blob/master/src/graphics/RenderVaoPool.cpp"><code>src/graphics/RenderVaoPool.cpp</code>🔗</a>)
+</figcaption>
+</figure>
+</div>
+
+<div class="col-span-2" style="font-size: small;">
+This is how the OpenGL 3.3 renderer managed VAOs.<br/>
+It used a small pool with an <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)">LRU strategy</a> to avoid unbounded allocations and excessive state changes.<br/>
+<br/>
+<ol>
+<li>Try to bind the requested <code>vertexFormat</code></li>
+<li>Scan every <code>VaoBinding</code> in the pool</li>
+<li>If found, update <code>lastBindTime</code></li>
+<li>If not found and there's space, create a new <code>VaoBinding</code></li>
+</ol>
+</div>
+
+</div>
+
+---
+
+## 💊 2018 - OpenGL 3.3 Renderer (4/4)
+
+<div grid="~ cols-5">
+
+<div class="col-span-3">
+<figure>
+
+```cpp
+      else
+      {
+          // Find the least recently used VAO
+          TimeStamp time = vaoPool_[0].lastBindTime;
+          for (unsigned int i = 1; i < vaoPool_.size(); i++)
+          {
+              if (vaoPool_[i].lastBindTime < time)
+              {
+                  index = i;
+                  time = vaoPool_[i].lastBindTime;
+              }
+          }
+      }
+
+      const bool bindChanged = vaoPool_[index].object->bind();
+      ASSERT(bindChanged == true || vaoPool_.size() == 1);
+      vaoPool_[index].format = vertexFormat;
+      vaoPool_[index].format.define();
+      vaoPool_[index].lastBindTime = TimeStamp::now();
+    }
+}
+```
+
+<figcaption>
+The second part of the <code>bindVao()</code> method (<a href="https://github.com/nCine/nCine/blob/master/src/graphics/RenderVaoPool.cpp"><code>src/graphics/RenderVaoPool.cpp</code>🔗</a>)
+</figcaption>
+</figure>
+</div>
+
+<div class="col-span-2" style="font-size: small;">
+<ol start="5">
+<li>If not found and no space left, search all bindings</li>
+<li>Recycle the least recently used (LRU) <code>VaoBinding</code></li>
+</ol>
+</div>
+
+</div>
 
 ---
 
@@ -835,7 +951,7 @@ routeAlias: nctl
 template <class T>
 struct isTriviallyConstructible
 {
-  static constexpr bool value = __is_trivially_constructible(T);
+    static constexpr bool value = __is_trivially_constructible(T);
 };
 
 template <class T>
@@ -888,7 +1004,7 @@ From <a href="https://github.com/nCine/nCine/blob/master/include/nctl/Array.h"><
 template <class T>
 inline typename removeReference<T>::type &&move(T &&arg)
 {
-  return static_cast<typename removeReference<T>::type &&>(arg);
+    return static_cast<typename removeReference<T>::type &&>(arg);
 }
 ```
 
@@ -1001,7 +1117,7 @@ Compressed pair implementation with <code>isEmpty</code> type trait to enable EB
 
 - Developed alongside an artist for real-world feedback
   - Integrated [CrashRpt](https://crashrpt.sourceforge.net/) on Windows to receive crash mini-dumps
-  - Now transitioning to Google [Crashpad](https://crashpad.chromium.org/), as CrashRpt is no longer maintained
+  - Will transition to Google [Crashpad](https://crashpad.chromium.org/) or [Sentry](https://sentry.io/), as CrashRpt is no longer maintained
 
 <figure class="w-[70%]">
 <img src="/img/ncParticleEditor.png" alt="ncParticleEditor" />
@@ -1334,7 +1450,7 @@ block-beta
 
 - A collision resolution probing strategy, using two additional delta values per array cell
   1. Hash the key and compute the bucket index. That's the ideal index, which we check first
-  2. If the item is not found, add that cell’s first delta value to determine the next cell index to check
+  2. If the item is not found, add that cell's first delta value to determine the next cell index to check
   3. If the item is not found, use the second delta value for all subsequent cells
   4. Stop when the delta is zero, marking the end of the probe chain
 - 📜 Reference: Preshing's [article](https://preshing.com/20160314/leapfrog-probing/)
@@ -1415,6 +1531,63 @@ block-beta
 </figure>
 
 ---
+routeAlias: pcg
+---
+
+## 💊 2019 - Permuted Congruential Generator (PCG) (1/2)
+
+- Switched all `rand()` calls to a new random generator (📰 [Dev Update 7](https://encelo.github.io/2019-01-08-ncine-dev-update-7/), 🗓️ Jan)
+- PCG uses a Linear Congruential Generator: $X_{n+1} = (a \cdot X_n + c) \bmod m$
+
+<figure style="font-size: small;">
+
+```cpp
+    uint32_t random(uint64_t &state, uint64_t &increment)
+    {
+        const uint64_t oldState = state;
+        state = oldState * 6364136223846793005ULL + increment; // Linear Congruential Generator
+        const uint32_t xorShifted = static_cast<uint32_t>(((oldState >> 18u) ^ oldState) >> 27u);
+        const uint32_t rotation = static_cast<uint32_t>(oldState >> 59u);
+        return (xorShifted >> rotation) | (xorShifted << ((-rotation) & 31));
+    }
+
+    uint32_t boundRandom(uint64_t &state, uint64_t &increment, uint32_t bound)
+    {
+        const uint32_t threshold = -bound % bound;
+        while (true)
+        {
+            const uint32_t r = random(state, increment);
+            if (r >= threshold)
+              return r % bound;
+        }
+    }
+```
+
+<figcaption class="left">
+The output is derived from <code>oldState</code> using an xorshift and rotation.<br/>
+The <code>boundRandom</code> function uses <em>rejection sampling</em> to discard biased results. (<a href="https://github.com/nCine/nCine/blob/master/src/base/Random.cpp"><code>src/base/Random.cpp</code>🔗</a>)
+</figcaption>
+</figure>
+
+---
+
+## 💊 2019 - Rejection Sampling in PCG (2/2)
+
+- PCG produces uniformly distributed numbers across the full 32-bit range ($0..2^{32}-1$)
+- But if the user requests a smaller range, some numbers need to be rejected to avoid bias
+- Example: RNG that generates numbers 0–11
+  - If we want a range 0–9 and just apply modulo:
+    - 10 maps to 0 and 11 maps to 1, so 0 and 1 occur more often than 2–9
+  - Correct solution: discard 10 and 11, and draw again until the result $< 10$
+- `boundRandom()` works the same way, but discards from the bottom instead of the top
+  - This is mathematically equivalent, it just makes the implementation simpler
+  - In the code we read: `const uint32_t threshold = -bound % bound;`
+  - Trick: `-bound` is $2^{32} - \texttt{bound}$, just like `uint32_t(-1)` is $2^{32}-1$ (`UINT_MAX`)
+  - Then `threshold = -bound % bound` = $(2^{32} - b) \bmod b = 2^{32} \bmod b$
+  - Exactly the count of leftover values after partitioning $0..2^{32}-1$ into buckets of size `bound`
+  - This trick avoids the need to represent $2^{32}$ directly, which does not fit in a `uint32_t`
+
+---
 
 ## 🗓️ 2020 - A Token of Support 💲
 
@@ -1469,7 +1642,7 @@ An entry in the nCine GitHub Actions workflow runs <a href="https://github.com/n
 
 ## 📸 2020 - SpookyGhost
 
-- I tried selling a tool for artists on itch.io, but it didn’t gain traction
+- I tried selling a tool for artists on itch.io, but it didn't gain traction
 - It's now free and open-source on GitHub, with optional donations still available
 
 <figure class="w-[75%]">
@@ -1700,7 +1873,7 @@ void operator delete[](void *ptr) noexcept
 ## 💊 2020 - Custom Allocators (3/3)
 
 - Using placement `new` to construct a `FreeListAllocator` inside a preallocated buffer
-  - We can’t heap-allocate the allocator itself if we want all allocations to go through it 🔄
+  - We can't heap-allocate the allocator itself if we want all allocations to go through it 🔄
   - One of the rare cases in C++ where the destructor must be called manually
 
 <figure>
@@ -2170,7 +2343,7 @@ block-beta
 - Published some "getting started" guides on the GitHub Wiki, to reach more users (🗓️ Mar)
 - Surpassed 1,000 [stars](https://github.com/nCine/nCine/stargazers) on GitHub ⭐ (🗓️ Jun)
 - Merged the <carbon-branch /> `openal_efx` branch (📰 [Dev Update 21](https://encelo.github.io/2025-01-14-ncine-dev-update-21/), 🗓️ May - Jun)
-- Started developing a multi-threaded job system (<carbon-branch /> `job_system`, 🗓️ May - Jul)
+- Started developing a multi-threaded job system (<carbon-branch /> `job_system`, 📰 [Dev Update 22](https://encelo.github.io/2025-09-21-ncine-dev-update-22/), 🗓️ May - Jul)
 - nCine became an official [addon](https://github.com/LuaLS/LLS-Addons/tree/main/addons/ncine) for the LuaLS extension in VS Code (🗓️ Nov)
   - Offers autocomplete, type checking, and full API documentation in the IDE
 - Released a new LDoc [documentation](https://ncine.github.io/docs/lua_master/)
@@ -2204,7 +2377,7 @@ routeAlias: job_system
 
 ## 💊 2024 - Job System (🚧 WIP) (1/3)
 
-- One thread spawned per logic core at program start ([thread pool](https://en.wikipedia.org/wiki/Thread_pool))
+- [Pool](https://en.wikipedia.org/wiki/Thread_pool) of threads pinned to physical cores (taking CPU topology into account)
 - Lock-free [work stealing](https://en.wikipedia.org/wiki/Work_stealing) queues per thread for automatic load-balancing
   - [Lock-free](https://en.wikipedia.org/wiki/Non-blocking_algorithm) achieved with Compare-And-Swap operations on atomics
 - Parent/children relationship enables waiting on parent jobs
@@ -2220,12 +2393,12 @@ routeAlias: job_system
 ```cpp
 struct Job
 {
-    JobFunction function;
-    Job *parent = nullptr;
-    nctl::Atomic32 unfinishedJobs;
+    JobFunction function = nullptr;
+    JobId parent = InvalidJobId;
+    nctl::AtomicU32 countersAndState;
     char data[JobDataSize];
-    nctl::Atomic32 continuationCount;
-    Job *continuations[JobNumContinuations];
+    JobId continuations[JobNumContinuations];
+    uint16_t generation = 0;
 };
 ```
 
@@ -2242,19 +2415,19 @@ To avoid <a href="https://en.wikipedia.org/wiki/False_sharing">false sharing</a>
 ```cpp
 while (true)
 {
-    while (!getJob(jobQueues) && shouldQuit == false)
-    {
-        queueMutex.lock();
-        queueCV.wait(queueMutex);
-        queueMutex.unlock();
-    }
-    if (shouldQuit) break;
-    execute(job, jobQueues);
+    queueSem.wait();
+    if (threadStruct->shouldQuit)
+      break;
+    JobId jobId = getJob(jobQueues, numThreads);
+    if (jobId == InvalidJobId)
+      continue;
+    execute(jobId, jobPool, jobQueues);
 }
 ```
 
 <figcaption class="left">
-Main loop of a thread function (<a href="https://github.com/nCine/nCine/blob/master/src/threading/JobSystem.cpp"><code>src/threading/JobSystem.cpp</code>🔗</a>)
+Main loop of a thread function (<a href="https://github.com/nCine/nCine/blob/master/src/threading/JobSystem.cpp"><code>src/threading/JobSystem.cpp</code>🔗</a>)<br/>
+Using a user-space semaphore to efficiently wake threads.
 </figcaption>
 </figure>
 </div>
@@ -2262,7 +2435,7 @@ Main loop of a thread function (<a href="https://github.com/nCine/nCine/blob/mas
 </div>
 
 <div class="absolute left-3/4 top-1/5" style="rotate: 25deg;font-size: small;">
-⚠️ GitHub links don't work as the<br/> code has not been pushed yet. ⚠️
+⚠️ GitHub links don't work as the<br/> code has not been merged yet. ⚠️
 </div>
 
 ---
@@ -2275,12 +2448,13 @@ Main loop of a thread function (<a href="https://github.com/nCine/nCine/blob/mas
 <figure>
 
 ```cpp
-/// The thread id for each thread
-static inline thread_local unsigned char threadId_;
+    /// The thread index for each thread
+    /*! \note The main thread has always a thread index equal to `MainThreadIndex`. */
+    thread_local unsigned char threadIndex_ = MainThreadIndex;
 ```
 
 <figcaption>
-Using C++11 <code>thread_local</code> keyword for Thread Local Storage (TLS) (<a href="https://github.com/nCine/nCine/blob/master/include/ncine/IJobSystem.h"><code>include/ncine/IJobSystem.h</code>🔗</a>)
+Using C++11 <code>thread_local</code> keyword for Thread Local Storage (TLS) (<a href="https://github.com/nCine/nCine/blob/master/src/threading/IJobSystem.cpp"><code>src/threading/IJobSystem.cpp</code>🔗</a>)
 </figcaption>
 </figure>
 
@@ -2290,18 +2464,17 @@ Using C++11 <code>thread_local</code> keyword for Thread Local Storage (TLS) (<a
 <figure>
 
 ```cpp
-void finish(Job *job, JobQueue *jobQueues)
+void finish(JobId jobId, JobPool &jobPool, JobQueue *jobQueues)
 {
-    const int32_t unfinishedJobs = --job->unfinishedJobs; // atomic decrement
-    if (unfinishedJobs == 0)
+    Job *job = jobPool.retrieveJob(jobId);
+    if (job->decrementUnfinishedJobs() == 1)
     {
-        // Releasing the job back to the pool.
-        job->function = nullptr;
-        if (job->parent)
-            finish(job->parent, jobQueues);
-        // run follow-up jobs
-        for (int i = 0; i < job->continuationCount; i++)
-            jobQueues[JobSystem::threadId()].push(job->continuations[i]);
+      if (job->parent != InvalidJobId)
+        finish(job->parent, jobPool, jobQueues);
+      const uint16_t continuationCount = job->loadContinuationCount(nctl::MemoryModel::ACQUIRE);
+      for (uint16_t i = 0; i < continuationCount; i++)
+        jobQueues[JobSystem::threadIndex()].push(job->continuations[i]);
+      jobPool.freeJob(jobId);
     }
 }
 ```
@@ -2320,28 +2493,38 @@ Finishing a job, signalling the parent, and running continuations (<a href="http
 <figure>
 
 ```cpp
-// If set to 1, the `JobId` will be a 16bit integer that encodes the thread id (5 bits) and the pool index (11 bits)
-// A packed id will limit the number of threads to 32, and the pool size to 2048.
-// Set it to 0 to use a 64bit pointer and overcome those limits (less space in the `Job` struct for remaining fields).
-#define PACKED_JOBID (0) // Experimental!
-
-#include <cstdint>
-#include "common_defines.h"
-
-namespace ncine {
-
-#if PACKED_JOBID
-using JobId = uint16_t;
-#else
-using JobId = uintptr_t;
-#endif
-using JobFunction = void (*)(JobId, const void*);
+static const uint16_t MaxNumJobs = 8192; // Can potentially go up to 2^16
+using JobId = uint32_t;
+static const JobId InvalidJobId = static_cast<JobId>(~0u);
+using JobFunction = void (*)(JobId, const void *);
+static const uint32_t JobDataSize = 36;
+static const uint32_t JobNumContinuations = 2;
+static_assert(JobDataSize >= sizeof(uintptr_t), "At least one user pointer should fit the Job structure");
 ```
 
 <figcaption class="left">
-Users are not exposed to raw pointers. <code>JobId</code> is a numeric, opaque identifier.<br/>
-When packed, it functions as a real <a href="https://en.wikipedia.org/wiki/Handle_(computing)">handle</a> encoding both the queue index (thread id) and the element index.<br/>
+Users are not exposed to raw pointers. <code>JobId</code> is a numeric, opaque identifier, made of an index and a generation.<br/>
+Each time a job slot is reused, its generation counter increases. This way, any stale job IDs are automatically detected as invalid.<br/>
 From: <a href="https://github.com/nCine/nCine/blob/master/include/ncine/IJobSystem.h"><code>include/ncine/IJobSystem.h</code>🔗</a>
+</figcaption>
+</figure>
+
+<figure>
+
+```cpp
+void UserSemaphore::post(unsigned int count)
+{
+    const int32_t c = count_.fetchAdd(count, nctl::MemoryModel::RELEASE);
+    if (c < 0)
+        futexWake(reinterpret_cast<int *>(&count_), count);
+}
+```
+
+<figcaption class="left">
+User-space semaphores combine an atomic with a fast kernel primitive.<br/>
+In the uncontended case they are as fast as a single atomic operation, falling back to the kernel only under contention.<br/>
+Implemented with <a href="https://en.wikipedia.org/wiki/Futex">futex</a> (Linux), <a href="https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitonaddress"><code>WaitOnAddress()</code></a> (Windows), and <a href="https://developer.apple.com/documentation/dispatch/dispatchsemaphore">GCD semaphores</a> (macOS).<br/>
+From: <a href="https://github.com/nCine/nCine/blob/master/src/threading/PosixThreadSync.cpp"><code>src/threading/PosixThreadSync.cpp</code>🔗</a>
 </figcaption>
 </figure>
 
@@ -2370,7 +2553,7 @@ Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/appte
 - ChatGPT suggested I contact Valve for a collaboration (no reply 😅)
 - Updated GitHub [`README.md`](https://github.com/nCine/nCine/blob/master/README.md) with documentation links and screenshots
 - Applied for conferences (Guadalindie in Malaga 👎, and /dev/games in Rome 👍)
-- Switched to introsort for `RenderCommand` sorting (🗓️ Jan)
+- Switched to introsort for `RenderCommand` sorting (📰 [Dev Update 22](https://encelo.github.io/2025-09-21-ncine-dev-update-22/), 🗓️ Jan)
 
 <div grid="~ cols-3">
 
@@ -2456,6 +2639,7 @@ inline void sort(Iterator first, Iterator last, Compare comp)
 </figure>
 
 <figure>
+
 ```mermaid {look: 'handDrawn', scale: 0.7}
 flowchart LR
   depth0(("depth 0")) --> depth1B(("depth 1"))
@@ -2469,6 +2653,7 @@ flowchart LR
   depth6 --> depth7(("depth 7"))
   depth7 --> depth8(("depth 8"))
 ```
+
 <figcaption>Some pivot selections lead to unbalanced partitions, deep recursion, and a worst-case time complexity of O(n²)</figcaption>
 </figure>
 
@@ -2479,6 +2664,7 @@ flowchart LR
 <div class="relative w-full h-full">
 
 <figure>
+
 ```cpp
 /// Introspective sort implementation with iterators and custom compare function
 template <class Iterator, class Compare>
@@ -2500,12 +2686,14 @@ inline void introsort(Iterator first, Iterator last, Compare comp, unsigned int 
     }
 }
 ```
+
 <figcaption>Note that introsort is called recursively, switch conditions are checked per each quicksort partition</figcaption>
 </figure>
 
 <div class="absolute left-1/2 top-1/4">
 
 <figure>
+
 ```mermaid {look: 'handDrawn', scale: 0.6}
 flowchart LR
   id0{{"Partition size < 16?"}}
@@ -2515,6 +2703,7 @@ flowchart LR
   id2 -- "No" --> id4("Partition with quicksort")
   id4 --> id0
 ```
+
 </figure>
 
 </div>
@@ -2617,8 +2806,8 @@ flowchart LR
 ## 🔮 Future Work
 
 - Finish _incomplete_ tasks:
-  - Complete the job system, then parallelize engine parts with Data Oriented Design
-  - Test and finalize the CrashPad integration
+  - ~~Finalize then test the CrashPad integration~~
+  - ~~Complete the job system~~, then parallelize engine parts with Data Oriented Design
 - Support more _technologies_:
   - Add a unified graphics layer supporting OpenGL, Vulkan, Metal, and WebGPU backends
   - Switch to SDL3 as the new default desktop backend
@@ -2628,6 +2817,7 @@ flowchart LR
   - Implement a raylib-compatible API on top of nCine to attract new users 🤯
   - Build a fully-fledged ImGui editor with a runtime scene "player" (like Unity/Godot)
 - Return to existing projects and _to-do notes_:
+  - ~~Update the nCine website~~
   - Revisit ncTracer for continuous learning and to stay sharp in graphics
   - Add new features to SpookyGhost: particles, timeline, batch processing
 
@@ -2666,6 +2856,7 @@ flowchart TD
 - <Link to="nctl">nCine Template Library</Link>
 - <Link to="sso">Small String Optimization</Link>
 - <Link to="leapfrog">Leapfrog Probing</Link>
+- <Link to="pcg">Permuted Congruential Generator </Link>
 
 </div>
 

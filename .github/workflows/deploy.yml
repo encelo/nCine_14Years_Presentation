@@ -1,5 +1,8 @@
 name: Deploy pages
 
+env:
+  EXPORT_FILENAME: nCine_14Years
+
 on:
   workflow_dispatch:
   push:
@@ -43,9 +46,9 @@ jobs:
       - name: Export
         run: |
           nr export --dark
-          mv nCine_14Years.pdf dist/
+          mv ${EXPORT_FILENAME}.pdf dist/
           nr export
-          mv nCine_14Years.pdf dist/nCine_14Years_light.pdf
+          mv ${EXPORT_FILENAME}.pdf dist/${EXPORT_FILENAME}_light.pdf
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
