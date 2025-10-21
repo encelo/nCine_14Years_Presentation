@@ -81,10 +81,10 @@ layout: cover
   </a>
 </div>
 
-<div class="absolute right-20 bottom-0 flex gap-2">
+<div class="absolute right-20 bottom-0.25 flex gap-2">
   <a href="https://ncine.github.io" target="_blank" alt="nCine Website"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
-    <img src="/img/ncine_icon_bw.svg" class="w-6 h-6" alt="nCine Logo">
+    <img src="/img/ncine_icon_bw.svg" class="w-5 h-5" alt="nCine Logo">
   </a>
 </div>
 
@@ -104,14 +104,14 @@ layout: cover
 
 <div class="absolute left-1/24 top-1/15">
 <figure class="w-35">
-<img src="/img/ncine_icon_1024.png" alt="nCine logo">
+<img src="/img/ncine_icon.svg" alt="nCine logo">
 </figure>
 </div>
 
 <div class="absolute left-1/24 top-10/15">
 <figure class="w-35">
-<img src="/img/ncine_website_qr.png" alt="https://ncine.github.io - QR code">
-<figcaption><a href="https://ncine.github.io">https://ncine.github.io</a></figcaption>
+<img src="/img/ncine_website_qr.svg" alt="https://ncine.github.io/ - QR code">
+<figcaption><a href="https://ncine.github.io/">https://ncine.github.io/</a></figcaption>
 </figure>
 </div>
 
@@ -120,6 +120,8 @@ layout: cover
   - Refresh the `cloc` output (lines of code statistics)
   - Regenerate the Git history graphs
 -->
+
+<!-- Using https://qr-code-styling.com/ for QR code generation. -->
 
 ---
 
@@ -446,7 +448,7 @@ routeAlias: monotonic
 
 <figure>
 
-```cpp{*}{class:'!children:text-xs'}
+```cpp
 #if defined(_WIN32)
     if (hasPerfCounter_) QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER *>(&counter));
     else counter = GetTickCount();
@@ -1539,7 +1541,7 @@ routeAlias: pcg
 - Switched all `rand()` calls to a new random generator (📰 [Dev Update 7](https://encelo.github.io/2019-01-08-ncine-dev-update-7/), 🗓️ Jan)
 - PCG uses a Linear Congruential Generator: $X_{n+1} = (a \cdot X_n + c) \bmod m$
 
-<figure style="font-size: small;">
+<figure>
 
 ```cpp
     uint32_t random(uint64_t &state, uint64_t &increment)
@@ -2840,6 +2842,8 @@ flowchart TD
   id2 --> id1
 ```
 
+---
+routeAlias: tech_pills
 ---
 
 ## 💊 List of Technical Pills
