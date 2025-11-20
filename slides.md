@@ -130,10 +130,10 @@ layout: cover
 - A portmanteau of "Encelo" and "engine" 😅
 - A cross-platform 2D framework for games, tools, and prototypes
   - Supports PC (Linux, Windows, macOS), Android, Raspberry Pi, and the web (Emscripten)
-  - Provided as a static/dynamic library with clean API and callbacks
-- Written in C++11, with Lua bindings
+  - Distributed as a static/dynamic library with a clean API and callbacks system
+- Written in C++11, with Lua bindings for scripting
 - Strong emphasis on performance and optimization
-- Source available on GitHub under the MIT license
+- Source available on GitHub under the MIT license [<carbon-logo-github />](https://github.com/ncine/nCine)
 - Based on a transformation scene graph and a node hierachy (no components)
 - A _learning opportunity_, both for me and for its users
 
@@ -144,7 +144,7 @@ Linking the static or dynamic version of the library has implications on the exp
 
 ## 📸 A Selection of Screenshots
 
-- A few examples of what has been built with or on top of the nCine
+- A few examples of games, prototypes, and tools built with the nCine
 
 <div grid="~ cols-2">
 
@@ -161,7 +161,7 @@ Linking the static or dynamic version of the library has implications on the exp
 <figure class="w-[75%]">
 <img src="/img/ncJump.png" alt="ncJump">
 <figcaption>
-<a href="https://github.com/Fahien/ncJump"><strong>ncJump</strong></a>, a platform game with Box2D physics by <a href="https://github.com/Fahien">Fahien</a>
+<a href="https://github.com/Fahien/ncJump"><strong>ncJump</strong></a>, a platform game using Box2D physics by <a href="https://github.com/Fahien">Fahien</a>
 </figcaption>
 </figure>
 </div>
@@ -174,7 +174,7 @@ Linking the static or dynamic version of the library has implications on the exp
 <figure class="w-[75%]">
 <img src="/img/jazz2.png" alt="Jazz² Resurrection">
 <figcaption>
-<a href="https://github.com/deathkiller/jazz2-native"><strong>Jazz² Resurrection</strong></a>, a Jazz Jackrabbit 2 reimplementation project by <a href="https://github.com/deathkiller">DeathKiller</a>
+<a href="https://github.com/deathkiller/jazz2-native"><strong>Jazz² Resurrection</strong></a>, a reimplementation of Jazz Jackrabbit 2 by <a href="https://github.com/deathkiller">DeathKiller</a>
 </figcaption>
 </figure>
 </div>
@@ -183,7 +183,7 @@ Linking the static or dynamic version of the library has implications on the exp
 <figure class="w-[75%]">
 <img src="/img/ncJugiMapFrameworkDemo.png" alt="ncJugiMapFrameworkDemo" />
 <figcaption>
-<a href="https://github.com/Jugilus/JugimapFramework"><strong>ncJugiMapFrameworkDemo</strong></a>, a demo test for <a href="https://jugimap.com">JugiMap</a> integration framework by <a href="https://github.com/Jugilus">Jugilus</a>
+<a href="https://github.com/Jugilus/JugimapFramework"><strong>ncJugiMapFrameworkDemo</strong></a>, a demo for <a href="https://jugimap.com">JugiMap</a> integration framework by <a href="https://github.com/Jugilus">Jugilus</a>
 </figcaption>
 </figure>
 </div>
@@ -1336,7 +1336,7 @@ routeAlias: leapfrog
 <figure>
 
 ```mermaid {look: 'handDrawn', scale: 0.6}
-block-beta
+block
   block: Keys
     columns 1
     ka["Key 0"]
@@ -1722,7 +1722,7 @@ routeAlias: continuous_integration
 <figure>
 
 ```mermaid {look: 'handDrawn', scale: 0.45}
-block-beta
+block
   block: platforms_compilers
     columns 1
     title1["<strong>Platform / Compiler</strong>"]
@@ -2377,7 +2377,7 @@ block-beta
 routeAlias: job_system
 ---
 
-## 💊 2024 - Job System (🚧 WIP) (1/3)
+## 💊 2024 - Job System (1/3)
 
 - [Pool](https://en.wikipedia.org/wiki/Thread_pool) of threads pinned to physical cores (taking CPU topology into account)
 - Lock-free [work stealing](https://en.wikipedia.org/wiki/Work_stealing) queues per thread for automatic load-balancing
@@ -2437,12 +2437,12 @@ Using a user-space semaphore to efficiently wake threads.
 </div>
 
 <div class="absolute left-3/4 top-1/5" style="rotate: 25deg;font-size: small;">
-⚠️ GitHub links don't work as the<br/> code has not been merged yet. ⚠️
+ℹ️ For more information, check out<br/><a href="https://encelo.github.io/nCine_JobSystem_Presentation/">The nCine Job System</a> presentation ℹ️
 </div>
 
 ---
 
-## 💊 2024 - Job System (🚧 WIP) (2/3)
+## 💊 2024 - Job System (2/3)
 
 - Jobs can spawn other jobs, queued on the same thread's queue (this is how `parallelFor` works)
 - The system is paired with a `LogEntryQueue` class for multi-threading logging
@@ -2488,7 +2488,7 @@ Finishing a job, signalling the parent, and running continuations (<a href="http
 
 ---
 
-## 💊 2024 - Job System (🚧 WIP) (3/3)
+## 💊 2024 - Job System (3/3)
 
 <br/>
 
@@ -2812,11 +2812,11 @@ flowchart LR
   - ~~Complete the job system~~, then parallelize engine parts with Data Oriented Design
 - Support more _technologies_:
   - Add a unified graphics layer supporting OpenGL, Vulkan, Metal, and WebGPU backends
-  - Switch to SDL3 as the new default desktop backend
+  - Switch to SDL3 as the new default desktop backend, support RGFW
   - Port to iOS (requires Metal support first)
 - Explore _new_ and ambitious projects:
   - Develop a C++ neural network library for games and experiments (NEAT and genetic algorithms)
-  - Implement a raylib-compatible API on top of nCine to attract new users 🤯
+  - Implement a raylib-compatible C API on top of nCine to attract new users 🤯
   - Build a fully-fledged ImGui editor with a runtime scene "player" (like Unity/Godot)
 - Return to existing projects and _to-do notes_:
   - ~~Update the nCine website~~
