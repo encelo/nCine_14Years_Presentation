@@ -137,6 +137,12 @@ layout: cover
 - Based on a transformation scene graph and a node hierachy (no components)
 - A _learning opportunity_, both for me and for its users
 
+<br/>
+<figure class="w-[40%]">
+<img src="/img/ncine_banner.png" alt="nCine banner" />
+<figcaption>The nCine banner with the stylized logotype</figcaption>
+</figure>
+
 <!-- But not everything is a node like in Godot.<br/>
 Linking the static or dynamic version of the library has implications on the exposed API. -->
 
@@ -352,7 +358,7 @@ Calculating my age is left as an exercise for the reader. 👴
   - Developer relations with Epic Games, Unity, Frostbite, Gameloft, and more
   - Presented at GDC, Unite, GameLab, and more
 - Added an OpenAL based sound system 🔊 (<carbon-commit /> [b8c23c54](https://github.com/nCine/nCine/commit/b8c23c54), 🗓️ Feb)
-  - Support for audio buffers (WAV) for effects and streams (Ogg Vorbis) for music playback
+  - Support for audio buffers (WAV) for effects, and streams (Ogg Vorbis) for music playback
 - Implemented a new file interface to support Android assets
 - Added PNG and WebP texture support using libpng and libwebp
 - Introduced GLFW as an alternative to the SDL1 desktop backend
@@ -363,7 +369,7 @@ Calculating my age is left as an exercise for the reader. 👴
 ## 🗓️ 2013 - Android as a Console
 
 - I always wanted to be a console programmer
-- Android was considered a console-like target for the nCine
+- I treated Android as a console-like target for the nCine
   - Working at ARM surrounded me with Android devices
   - Set-top boxes running Android TV were becoming popular
   - I received a Google ADT-1 as a gift at Unite 2014 in Seattle 🎁
@@ -488,7 +494,7 @@ Three different backends, each one with a fallback (<a href="https://github.com/
 - Stylistic coherence with [Artistic Style](https://astyle.sourceforge.net/) (<carbon-branch /> `codestyle`, <carbon-commit /> [d111d9c1](https://github.com/nCine/nCine/commit/d111d9c1), 🗓️ Oct - Dec)
   - Moved private headers to `src/include` so only public API headers remain in `include`
   - Removed the `nc` prefix from class names in favour of the `ncine` namespace
-  - Kept a prefix for interfaces (abstract classes): `IAppEventHandler`
+  - Kept a "`I`" prefix for interfaces (abstract classes): `IAppEventHandler`
 - Custom string class with iterator
 - Templated static array class with iterator
   - Uses stack storage, capacity is fixed (`template <class T, unsigned int C>`)
@@ -549,7 +555,7 @@ Binding the geometry and material before issuing the draw call (<a href="https:/
 - Added support for MinGW/MSYS2 (🗓️ Mar)
 - `ncPong` is the first official nCine project, a Pong clone (🗓️ May)
 - CMake scripts to build dependency libraries for all platforms (🗓️ May)
-  - [`nCine-libraries`](https://github.com/nCine/nCine-libraries/), [`nCine-android-libraries`](https://github.com/nCine/nCine-android-libraries/) repositories
+  - [`nCine-libraries`](https://github.com/nCine/nCine-libraries/) and [`nCine-android-libraries`](https://github.com/nCine/nCine-android-libraries/) repositories
 
 <div class="absolute left-4/5 top-1/8">
 <figure class="w-[100%]">
@@ -641,19 +647,22 @@ routeAlias: atomic
 <figure>
 
 ```cpp
-const int32_t t = top_; // nctl::Atomic32 top_;
-
-    // ...
-    if (top_.cmpExchange(t + 1, t) == false)
-    {
-      // a concurrent steal or pop operation removed an element from the deque in the meantime.
-      return nullptr;
-    }
+JobId JobQueue::steal()
+{
+  int32_t t = top_.load(nctl::MemoryModel::ACQUIRE); // nctl::Atomic32 top_;
+  // [Omitted]
+  if (top_.cmpExchange(t, t + 1, nctl::MemoryModel::ACQUIRE) == false)
+  {
+    // A concurrent steal or pop operation removed an element from the deque in the meantime.
+    return InvalidJobId;
+  }
+  // [Omitted]
+}
 ```
 
 <figcaption class="left">
 We are trying to write <code>t + 1</code> to <code>top_</code>, but only if no thread has modified it in the meantime.<br/>
-We expect its value to be <code>t</code>; should it be different, we return a <code>nullptr</code> (<a href="https://github.com/nCine/nCine/blob/master/src/threading/JobQueue.cpp"><code>src/threading/JobQueue.cpp</code>🔗</a>).
+We expect its value to be <code>t</code>; should it be different, we return an <code>InvalidJobId</code> (<a href="https://github.com/nCine/nCine/blob/master/src/threading/JobQueue.cpp"><code>src/threading/JobQueue.cpp</code>🔗</a>).
 </figcaption>
 </figure>
 
@@ -789,8 +798,8 @@ The first part of the <code>bindVao()</code> method (<a href="https://github.com
 </div>
 
 <div class="col-span-2" style="font-size: small;">
-This is how the OpenGL 3.3 renderer managed VAOs.<br/>
-It used a small pool with an <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)">LRU strategy</a> to avoid unbounded allocations and excessive state changes.<br/>
+This is how the OpenGL 3.3 renderer manages VAOs.<br/>
+It uses a small pool with an <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)">Least Recently Used</a> (LRU) strategy to avoid unbounded allocations and excessive state changes.<br/>
 <br/>
 <ol>
 <li>Try to bind the requested <code>vertexFormat</code></li>
@@ -1055,7 +1064,7 @@ From <a href="https://github.com/nCine/nCine/blob/master/include/nctl/iterator.h
 
 - STL and nCTL smart pointers use the same memory as a raw pointer
   - They rely on a compressed pair to store the pointer and its custom deleter
-  - Thanks to the _Empty Base Optimization_, a stateless deleter doesn't take up space
+  - Thanks to the [_Empty Base Optimization_](https://en.cppreference.com/w/cpp/language/ebo.html), a stateless deleter doesn't take up space
   - nCTL includes a <a href="https://github.com/nCine/nCine/blob/master/unit_tests/gtest_uniqueptr.cpp">unit test</a> to verify there's no memory overhead
 
 <figure>
@@ -1066,14 +1075,14 @@ template <class T1, class T2, bool value> struct PairImpl
 {
     T1 first;
     T2 second;
-    // ....
+    // [Omitted]
 };
 
 /// Specialization for empty second type
 template <class T1, class T2> struct PairImpl<T1, T2, true>
 {
     T1 first;
-    // ...
+    // [Omitted]
 };
 
 template <class T1, class T2> using Pair = PairImpl<T1, T2, isEmpty<T2>::value>;
@@ -1144,7 +1153,7 @@ routeAlias: sso
 ```cpp
 class String
 {
-  // ...
+  // [Omitted]
   private:
     static const unsigned int SmallBufferSize = 16;
 
@@ -1173,7 +1182,7 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 - I could finally release the nCine on GitHub! (🗓️ Jun)
   - Featured on [Phoronix](https://www.phoronix.com/news/nCine-Game-Engine) and [GameFromScratch.com](https://gamefromscratch.com/ncine-2d-open-source-game-engine/)
   - Using Azure Pipelines for Continuous Integration ✅ (📰 [Dev Update 10](https://encelo.github.io/2019-07-03-ncine-dev-update-10/), 🗓️ May)
-- Some experiments with ECS (unmerged <carbon-branch /> `ecs`, 🗓️ Mar)
+- Some experiments with ECS (unmerged <carbon-branch /> `ecs_old`, 🗓️ Mar)
 - Porting to Emscripten for web support (📰 [Dev Update 11](https://encelo.github.io/2019-07-16-ncine-dev-update-11/))
 - Integration with the [RenderDoc](https://renderdoc.org/) GFX debugger and the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate GUI
 - New hashmap with open addressing and probing (<carbon-commit /> [98f2364d](https://github.com/nCine/nCine/commit/98f2364d), 🗓️ Jan)
@@ -1250,7 +1259,7 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 
 - Works on all supported desktop platforms leveraging Git and CMake
 - Can download sources or artifacts, then compile dependencies, the nCine, and your project
-- Inspired by a similar tool we had in Frostbite
+- Inspired by a similar command line tool we had in Frostbite
 
 <figure class="w-[65%]">
 <img src="/img/ncline.png" alt="ncline" />
@@ -1731,8 +1740,8 @@ block
     combination3("Windows / Visual Studio 2022")
     combination4("MinGW / GCC")
     combination5("MinGW / Clang")
-    combination6("macOS 13 / Apple Clang")
-    combination7("macOS 15 / Apple Clang")
+    combination6("macOS 15 (ARM) / Apple Clang")
+    combination7("macOS 15 (Intel) / Apple Clang")
     combination8("Android v7a / Clang")
     combination9("Android v8a / Clang")
     combination10("Android x86_64 / Clang")
@@ -1890,13 +1899,13 @@ static FreeListAllocator &freelistAllocator = reinterpret_cast<FreeListAllocator
 
 AllocManager::AllocManager()
 {
-    // ...
+    // [Omitted]
     new (&freelistAllocator) FreeListAllocator("Default", FreeListSize, freelistMemory); // placement new
 }
 
 AllocManager::~AllocManager()
 {
-    // ...
+    // [Omitted]
     (&freelistAllocator)->~FreeListAllocator(); // explicit call of the class destructor
 }
 ```
@@ -1910,8 +1919,9 @@ AllocManager::~AllocManager()
 
 - I joined The Multiplayer Group remotely as a Senior Rendering Engineer
   - They had no issues with me continuing my open-source contributions
-  - I have worked on the Creation Engine 2 for Starfield
-- I wrote a retrospective [article](https://encelo.github.io/2021-06-21-ten-years-ncine/) about the first _ten years_ and got interviewed in a [podcast](https://runtimepodcast.com/#5)
+  - I worked on the Creation Engine 2 for Starfield
+  - Co-developed an internal R&D prototype for a virtualized geometry rendering system
+- I wrote a retrospective [article](https://encelo.github.io/2021-06-21-ten-years-ncine/) about the first _ten years_ and got interviewed in a [podcast](https://runtimepodcast.com/#5) 🎙️
 - I bought a Raspberry Pi 4B and fixed minor build issues (also, SpookyGhost got some [attention](https://www.tomshardware.com/news/spookyghost-comes-to-raspberry-pi))
 - Some parts of the site were moved to the GitHub Wiki
 - Thinking about building an editor... 🤔 (#2)
@@ -2539,7 +2549,7 @@ From: <a href="https://github.com/nCine/nCine/blob/master/src/threading/PosixThr
 
 <figure class="w-[100%]">
 <img src="/img/Tracy_thread_pool.png" alt="Tracy mutli-threading capture" />
-<figcaption class="left">
+<figcaption>
 Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/apptest_jobsystem.cpp"><code>apptest_jobsystem</code></a>, showing jobs execution distributed among worker threads
 </figcaption>
 </figure>
@@ -2590,7 +2600,7 @@ Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/appte
 
 ## 📸 2025 - Wet Paper
 
-- The GGJ game is still in development and will be a new showcase for users
+- The GGJ game has been in development for months after the jam, it's the latest showcase for users
   - With custom shaders, statistics, load/save settings in TOML format, music, joystick vibration
   - A dogfooding experience to make nCine better (remember the Blender Open Movies?) 🐶
 
@@ -2656,7 +2666,10 @@ flowchart LR
   depth7 --> depth8(("depth 8"))
 ```
 
-<figcaption>Some pivot selections lead to unbalanced partitions, deep recursion, and a worst-case time complexity of O(n²)</figcaption>
+<figcaption>
+Some pivot selections lead to unbalanced partitions, deep recursion, and a worst-case time complexity of
+ <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo></math> (quadratic)
+</figcaption>
 </figure>
 
 ---
@@ -2807,6 +2820,8 @@ flowchart LR
 
 ## 🔮 Future Work
 
+<div style="font-size: medium;">
+
 - Finish _incomplete_ tasks:
   - ~~Finalize then test the CrashPad integration~~
   - ~~Complete the job system~~, then parallelize engine parts with Data Oriented Design
@@ -2822,6 +2837,8 @@ flowchart LR
   - ~~Update the nCine website~~
   - Revisit ncTracer for continuous learning and to stay sharp in graphics
   - Add new features to SpookyGhost: particles, timeline, batch processing
+
+</div>
 
 ---
 layout: cover
