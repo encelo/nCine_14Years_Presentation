@@ -2403,7 +2403,7 @@ routeAlias: job_system
 <figure>
 
 ```cpp
-struct Job
+struct alignas(64) Job
 {
     JobFunction function = nullptr;
     JobId parent = InvalidJobId;
@@ -2416,7 +2416,7 @@ struct Job
 
 <figcaption class="left">
 The job system pillar: the <code>Job</code> structure (<a href="https://github.com/nCine/nCine/blob/master/src/include/Job.h"><code>src/include/Job.h</code>🔗</a>)<br/>
-To avoid <a href="https://en.wikipedia.org/wiki/False_sharing">false sharing</a>, it should occupy at least one cache line.
+To avoid <a href="https://en.wikipedia.org/wiki/False_sharing">false sharing</a>, it should occupy at least one cache line (64 bytes).
 </figcaption>
 </figure>
 </div>
@@ -2558,6 +2558,9 @@ Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/appte
 
 ## 🗓️ 2025 - Let's Try Some Different Things
 
+<div grid="~ cols-20">
+<div class="col-span-16">
+
 - Industry layoffs finally hit me, currently job-free but time-rich ⏳ (🗓️ Mar)
 - I made an nCine game at the Global Game Jam (🗓️ Jan)
   - I also sponsored the event and gave away an nCine mug as a prize 🍺
@@ -2566,20 +2569,48 @@ Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/appte
 - Updated GitHub [`README.md`](https://github.com/nCine/nCine/blob/master/README.md) with documentation links and screenshots
 - Applied for conferences (Guadalindie in Malaga 👎, and /dev/games in Rome 👍)
 - Switched to introsort for `RenderCommand` sorting (📰 [Dev Update 22](https://encelo.github.io/2025-09-21-ncine-dev-update-22/), 🗓️ Jan)
+- Started signing GitHub commits (with GPG subkeys on a Yubikey 5C NFC, 🗓️ Nov)
 
-<div grid="~ cols-3">
+</div>
 
-<div>
-<figure class="w-[65%]">
+<div class="col-span-4">
+
+<br/>
+<br/>
+<br/>
+<figure class="w-[125%]">
+<img src="/img/GitHub_verified_commit.png" alt="GitHub verified commit" />
+<figcaption>A GitHub verified commit</figcaption>
+</figure>
+
+<figure class="w-[85%]">
+<img src="/img/GitHub_signed_commit.png" alt="GitHub signed commit information" />
+<figcaption>GitHub signed commit information</figcaption>
+</figure>
+</div>
+
+</div>
+
+<div grid="~ cols-20">
+
+<div class="col-span-6">
+<figure class="w-[64%]">
 <img src="/img/IMG_20250120_174537_cropped.jpg" alt="The nCine mug" />
 <figcaption>The nCine mug prize</figcaption>
 </figure>
 </div>
 
-<div class="col-span-2">
-<figure class="w-[62%]">
+<div class="col-span-10">
+<figure class="w-[73%]">
 <img src="/img/DevGames2025.png" alt="My presentation card for /dev/games" />
 <figcaption>My presentation card for /dev/games 2025</figcaption>
+</figure>
+</div>
+
+<div class="col-span-4">
+<figure class="w-[60%]">
+<img src="/img/YubiKey_5C_NFC.png" alt="YubiKey 5C NFC" />
+<figcaption>YubiKey 5C NFC</figcaption>
 </figure>
 </div>
 
@@ -2732,7 +2763,7 @@ flowchart LR
 - Brainstormed game, business, and collaboration ideas
 - Assisted me in writing a quicksort unit test for nCine
 - Helped me proofread this presentation 👨‍🏫
-  - Wrote bash and Python scripts to create charts about Git activity
+  - Wrote bash and Python scripts to create Git activity charts (next slide)
   - Explained how to write custom CSS code for [Slidev](https://sli.dev/)
 - Helped setup the refraction shader in 2D for Wet Paper
 
@@ -2766,7 +2797,7 @@ flowchart LR
 <div>
 <figure class="h-45">
 <img src="/img/charts/commits_per_hour.svg" alt="Commits per Hour">
-<figcaption>Commits per Hour (yes, I'm a 🧛‍♂️)</figcaption>
+<figcaption>Commits per Hour (yes, I'm a <span style="font-style: normal;">🧛‍♂️</span>)</figcaption>
 </figure>
 </div>
 
