@@ -240,24 +240,24 @@ Linking the static or dynamic version of the library has implications on the exp
 /-------------------------------------------------------------------------------\
 |Language                     files          blank        comment           code|
 |-------------------------------------------------------------------------------|
-|C++                            394          18410           3661          90416|
-|C/C++ Header                   353           7828           4478          32213|
-|CMake                           47            756            431           6078|
+|C++                            403          18960           3690          93004|
+|C/C++ Header                   357           7880           4548          32403|
+|XML                              2              0              1           7219|
+|CMake                           47            757            424           6090|
 |YAML                             7            173             28            901|
 |Lua                             10            137              5            600|
 |GLSL                            21             67              0            340|
 |Markdown                         1             18              0             87|
 |Gradle                           2              1              0             23|
 |INI                              1              2              0             10|
-|XML                              1              0              0              5|
 |-------------------------------------------------------------------------------|
-|SUM:                           837          27392           8603         130673|
+|SUM:                           851          27995           8696         140677|
 \-------------------------------------------------------------------------------/
 ```
 
 <figcaption class="left">
-The main <strong>nCine</strong> repository, counting the <code>job_system</code> branch and excluding external projects as of September 29, 2025.<br/>
-Over 26,000 lines are dedicated to unit tests. <span style="font-style: normal;">😱</span>
+Lines of code counted from the <code>master</code> branch of the main <strong>nCine</strong> repository as of December 4, 2025, excluding external dependencies.<br/>
+Nearly 28,000 of them belong to the unit test suite. <span style="font-style: normal;">🔍</span>
 </figcaption>
 </figure>
 
@@ -266,14 +266,52 @@ Over 26,000 lines are dedicated to unit tests. <span style="font-style: normal;"
 ## How It All Began
 
 - I was born in 1983 and got an Amiga 500 in 1991 👴
-- The Amiga had amazing games, but also a vibrant _demoscene_! ❤️
+- The Amiga had amazing games, but also a vibrant [_demoscene_](https://en.wikipedia.org/wiki/Demoscene)! ❤️
   - The pursuit of beauty and wonder through mastery of the machine 🧙‍♂️
 - In 2000, I jumped on the open source and *nix train (still on the Amiga) 🚂
 
-<figure class="w-[50%]">
+<div grid="~ cols-2 gap-x-8">
+
+<div>
+<figure class="w-[100%]">
 <img src="/img/IMG_20250106_211511.jpg" alt="Young Encelo" />
 <figcaption>That's me in the early '90s, playing on my first Amiga</figcaption>
 </figure>
+</div>
+
+<div>
+<div grid="~ cols-2">
+
+<div>
+<figure class="w-[90%]">
+<img src="/img/Enigma_demo.png" alt="Enigma demo" />
+<figcaption><a href="https://www.pouet.net/prod.php?which=394">Enigma</a> by Phenomena (1991)</figcaption>
+</figure>
+
+<br/>
+<figure class="w-[90%]">
+<img src="/img/SmokeMirrors_demo.jpg" alt="Smoke & Mirrors demo" />
+<figcaption><a href="https://www.pouet.net/prod.php?which=61215">Smoke & Mirrors</a> by Ghostown & Loonies (2013)</figcaption>
+</figure>
+</div>
+
+<div>
+<figure class="w-[90%]">
+<img src="/img/DesertDream_demo.gif" alt="Deseert Dream demo" />
+<figcaption><a href="https://www.pouet.net/prod.php?which=1483">Desert Dream</a> by Kefrens (1993)</figcaption>
+</figure>
+
+<br/>
+<figure class="w-[90%]">
+<img src="/img/Hologon_demo.png" alt="Hologon demo" />
+<figcaption><a href="https://www.pouet.net/prod.php?which=88025">Hologon</a> by The Electronic Knights (2020)</figcaption>
+</figure>
+</div>
+
+</div>
+</div>
+
+</div>
 
 <!--
 Back in March 2000 I had the first contacts with the *nix world, NetBSD 1.4.2 on my 68030 A1200 first, then LinuxPPC 2000 shortly after.
@@ -678,8 +716,10 @@ routeAlias: cpp11
 - Use delegating constructors to remove initialization functions
 - Convert most enumerations to `enum class`
 - Replace `typedef`s with type alias declarations (`using`)
-- Introduce range-based loops in a few places (`for (IAudioPlayer *player : pausedPlayers_)`)
+- Introduce range-based loops in a few places (`for (IAudioPlayer *p : players_)`)
 - Use `auto` sparingly with iterators
+- Promote some values to `constexpr`
+- Annotate a few functions with `[[noreturn]]` and `[[nodiscard]]` (C++17) attributes
 - Add support for move semantics in containers 💪
 - Replace almost all raw pointers with smart pointers 🤓
 
@@ -1144,7 +1184,7 @@ routeAlias: sso
 ## 💊 2018 - Small String Optimization
 
 - Short strings stored inside the string object, avoiding heap allocation
-- Buffer size chosen to fit the whole string object in one CPU cache line
+- Buffer size chosen to fit two string objects in one CPU cache line
 - Since CPUs load full cache lines, accessing short strings is essentially free
 - Larger strings trigger heap allocation and copying
 
@@ -1155,8 +1195,7 @@ class String
 {
   // [Omitted]
   private:
-    static const unsigned int SmallBufferSize = 16;
-
+    static constexpr unsigned int SmallBufferSize = 24;
     union Buffer
     {
         char *begin_;
@@ -1167,10 +1206,11 @@ class String
     unsigned int length_;
     unsigned int capacity_;
 };
+static_assert(sizeof(String) == 32, "String object size should be exactly half a cache line");
 ```
 
 <figcaption>
-SSO, a common optimization also found in <code>std::string</code> (<a href="https://github.com/nCine/nCine/blob/master/src/base/String.cpp"><code>src/base/String.cpp</code> 🔗</a>)
+SSO, a common optimization also found in <code>std::string</code> (<a href="https://github.com/nCine/nCine/blob/master/include/nctl/String.h"><code>include/nctl/String.h</code> 🔗</a>)
 </figcaption>
 </figure>
 
