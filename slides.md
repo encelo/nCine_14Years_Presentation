@@ -240,24 +240,24 @@ Linking the static or dynamic version of the library has implications on the exp
 /-------------------------------------------------------------------------------\
 |Language                     files          blank        comment           code|
 |-------------------------------------------------------------------------------|
-|C++                            403          18960           3690          93004|
-|C/C++ Header                   357           7880           4548          32403|
-|XML                              2              0              1           7219|
-|CMake                           47            757            424           6090|
-|YAML                             7            173             28            901|
+|C++                            405          19140           3692          93882|
+|C/C++ Header                   359           7952           4554          32734|
+|CMake                           47            797            408           6474|
+|YAML                             7            230             33           1175|
 |Lua                             10            137              5            600|
 |GLSL                            21             67              0            340|
 |Markdown                         1             18              0             87|
 |Gradle                           2              1              0             23|
 |INI                              1              2              0             10|
+|XML                              1              0              0              5|
 |-------------------------------------------------------------------------------|
-|SUM:                           851          27995           8696         140677|
+|SUM:                           854          28344           8692         135330|
 \-------------------------------------------------------------------------------/
 ```
 
 <figcaption class="left">
-Lines of code counted from the <code>master</code> branch of the main <strong>nCine</strong> repository as of December 4, 2025, excluding external dependencies.<br/>
-Nearly 28,000 of them belong to the unit test suite. <span style="font-style: normal;">🔍</span>
+Lines of code in the <code>master</code> branch of the main <strong>nCine</strong> repository as of January 23, 2026.<br/>
+Nearly 28,500 of them belong to the unit test suite. <span style="font-style: normal;">🔍</span>
 </figcaption>
 </figure>
 
@@ -393,7 +393,7 @@ Calculating my age is left as an exercise for the reader. 👴
 - I moved to Cambridge to work for ARM 🇬🇧 (🗓️ Dec)
   - nCine was still in early development, but caught attention during my interview
   - Asked and got approval from my manager to release it open source in the future
-  - Developer relations with Epic Games, Unity, Frostbite, Gameloft, and more
+  - Developer relations with Epic Games, Unity, Frostbite, Gameloft, and others
   - Presented at GDC, Unite, GameLab, and more
 - Added an OpenAL based sound system 🔊 (<carbon-commit /> [b8c23c54](https://github.com/nCine/nCine/commit/b8c23c54), 🗓️ Feb)
   - Support for audio buffers (WAV) for effects, and streams (Ogg Vorbis) for music playback
@@ -406,7 +406,7 @@ Calculating my age is left as an exercise for the reader. 👴
 
 ## 🗓️ 2013 - Android as a Console
 
-- I always wanted to be a console programmer
+- I always wanted to be a console programmer 🎮
 - I treated Android as a console-like target for the nCine
   - Working at ARM surrounded me with Android devices
   - Set-top boxes running Android TV were becoming popular
@@ -480,7 +480,10 @@ Calculating my age is left as an exercise for the reader. 👴
 <div class="flex flex-col items-center">
 <figure class="w-90">
 <img src="/img/charts/code_changes_combined_with_avg_years.svg" alt="Additions/Deletions Over Time">
-<figcaption>Additions/Deletions Over Time</figcaption>
+<figcaption>
+Additions and deletions over time.<br/>
+The red arrow highlights a pronounced drop in git activity.
+</figcaption>
 </figure>
 </div>
 
@@ -493,16 +496,16 @@ routeAlias: monotonic
 <figure>
 
 ```cpp
-#if defined(_WIN32)
+#if defined(_WIN32) // 1. Windows backend
     if (hasPerfCounter_) QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER *>(&counter));
     else counter = GetTickCount();
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) // 2. macOS backend
     #if __MAC_10_12
     counter = clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW);
     #else
     counter = mach_absolute_time();
     #endif
-#else
+#else // 3. Linux and Android backend
     if (hasMonotonicClock_)
     {
         struct timespec now;
@@ -533,6 +536,7 @@ Three different backends, each one with a fallback (<a href="https://github.com/
   - Moved private headers to `src/include` so only public API headers remain in `include`
   - Removed the `nc` prefix from class names in favour of the `ncine` namespace
   - Kept a "`I`" prefix for interfaces (abstract classes): `IAppEventHandler`
+  - To beautify code I later moved to [Uncrustify](https://uncrustify.sourceforge.net/), but today I use [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
 - Custom string class with iterator
 - Templated static array class with iterator
   - Uses stack storage, capacity is fixed (`template <class T, unsigned int C>`)
@@ -546,6 +550,7 @@ Three different backends, each one with a fallback (<a href="https://github.com/
   - The nCine was still not ready for showtime, yet the company was supportive about its release
   - I worked on the custom engine of Clumsy Ninja and Dawn of Titans
 - Merged the OpenGL 2 <carbon-branch /> `new_renderer` branch (<carbon-commit /> [6e8070f3](https://github.com/nCine/nCine/commit/6e8070f3), 🗓️ Aug)
+- Added a template-based hashmap container using separate chaining for collisions
 - Added algorithms for containers and refactored iterators
 - Shaders can be embedded in the source as `char` arrays generated by CMake (🗓️ Dec)
 
@@ -558,8 +563,9 @@ routeAlias: gl2_renderer
 - Moved away from fixed pipeline
   - Added vector, matrix, and quaternion classes
   - Added more OpenGL wrappers (buffer objects, FBOs, render buffers, shader programs, textures)
-  - Introduced classes to handle shader attributes and uniforms (cached in a new hashmap container)
+  - Introduced classes to handle shader attributes and uniforms (cached in the new hashmap container)
   - Implemented a general render command with new material and geometry classes
+  - Updated renderer to OpenGL ES 2.0 on Android too
 
 <br/>
 <figure>
@@ -593,12 +599,12 @@ Binding the geometry and material before issuing the draw call (<a href="https:/
 - Added support for MinGW/MSYS2 (🗓️ Mar)
 - `ncPong` is the first official nCine project, a Pong clone (🗓️ May)
 - CMake scripts to build dependency libraries for all platforms (🗓️ May)
-  - [`nCine-libraries`](https://github.com/nCine/nCine-libraries/) and [`nCine-android-libraries`](https://github.com/nCine/nCine-android-libraries/) repositories
+  - Check the [`nCine-libraries`](https://github.com/nCine/nCine-libraries/) and [`nCine-android-libraries`](https://github.com/nCine/nCine-android-libraries/) repositories
 
 <div class="absolute left-4/5 top-1/8">
 <figure class="w-[100%]">
 <img src="/img/oldlogo.png" alt="Old nCine Logo" />
-<figcaption>Old nCine logo</figcaption>
+<figcaption>First nCine logo</figcaption>
 </figure>
 </div>
 
@@ -613,7 +619,7 @@ Binding the geometry and material before issuing the draw call (<a href="https:/
 
 ## 📸 2016 - ncPong
 
-- The repository contains both a C++ and a Lua version
+- The repository contains both a C++ and a Lua version of the game
 
 <figure class="w-[75%]">
 <img src="/img/ncPong.png" alt="ncPong" />
@@ -627,7 +633,7 @@ Binding the geometry and material before issuing the draw call (<a href="https:/
 ## 🗓️ 2017 - A Leap Into The Snow ☃️
 
 - I moved to Stockholm to work as a Rendering Engineer for Frostbite 🇸🇪 (🗓️ Mar)
-  - To an interview question, I replied: "I don't know how STL handles it, but in my framework..." 😎
+  - To an interview question, I replied: "I don't know STL's approach, but here is nCine's..." 😎
   - Shortly after, I was ready to release the sources, but contract restrictions prevented it
   - Kept sharing binary builds with friends on Discord as a fallback
   - Credited in multiple EA titles, including FIFA 18-20, Battlefront II, Battlefield V, and Anthem
@@ -711,8 +717,8 @@ routeAlias: cpp11
 ## 💊 2018 - C++11 Subset in nCine
 
 - Replace `NULL` with `nullptr`
-- Mark disabled special member functions explicitly with `=delete`
-- Adopt the `override` specifier
+- Mark disabled special member functions explicitly with `= delete`
+- Adopt the `override` specifier to prevent silent polymorphism bugs
 - Use delegating constructors to remove initialization functions
 - Convert most enumerations to `enum class`
 - Replace `typedef`s with type alias declarations (`using`)
@@ -750,7 +756,7 @@ const bool shouldSplit = command->lowerMaterialSortKey() != prevCommand->lowerMa
 
 <figcaption class="left">
 Split condition for a batch of render commands.<br/>
-Sort key encodes layer information in the upper 32 bits, and textures, shaders, and blending data in the lower 32 bits.<br/>
+A material sort key encodes layer information in the upper 32 bits, and textures, shaders, and blending data in the lower 32 bits.<br/>
 From <a href="https://github.com/nCine/nCine/blob/master/src/graphics/RenderBatcher.cpp"><code>src/graphics/RenderBatcher.cpp</code>🔗</a>
 </figcaption>
 </figure>
@@ -839,7 +845,7 @@ The first part of the <code>bindVao()</code> method (<a href="https://github.com
 
 <div class="col-span-2" style="font-size: small;">
 This is how the OpenGL 3.3 renderer manages VAOs.<br/>
-It uses a small pool with an <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)">Least Recently Used</a> (LRU) strategy to avoid unbounded allocations and excessive state changes.<br/>
+It uses a fixed-size small pool with an <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)">Least Recently Used</a> (LRU) strategy to avoid unbounded allocations and excessive state changes.<br/>
 <br/>
 <ol>
 <li>Try to bind the requested <code>vertexFormat</code></li>
@@ -960,7 +966,7 @@ RenderDoc showing degenerate vertices from <a href="https://github.com/nCine/nCi
   - Using [Gcovr](https://gcovr.com/) for code coverage
   - Tests are taking a large portion of nCine codebase, but coverage results are decent
 - Using [Google Benchmark](https://github.com/google/benchmark) support library
-  - nCTL vs STL: now I'm sure my library is both correct and fast 🚀
+  - Benchmarking nCTL vs STL: now I'm sure my library is both correct and fast 🚀
 
 <br/>
 <div grid="~ cols-2">
@@ -1141,20 +1147,20 @@ Compressed pair implementation with <code>isEmpty</code> type trait to enable EB
 - Integration with [Dear ImGui](https://github.com/ocornut/imgui), an immediate mode GUI toolkit (<carbon-commit /> [aff7e611](https://github.com/nCine/nCine/commit/aff7e611), 🗓️ Aug)
 - Add a debug overlay interface made with ImGui
 - Integration with the [Tracy](https://github.com/wolfpld/tracy) frame profiler (<carbon-commit /> [c8338ace](https://github.com/nCine/nCine/commit/c8338ace), 🗓️ Dec)
-- `ncParticleEditor`, an ImGui editor for particle systems and emitters
+- `ncParticleEditor`, an ImGui editor for particle systems and emitters (🗓️ Sep)
 
 <br/>
-<div grid="~ cols-2">
+<div grid="~ cols-2 gap-x-16">
 
 <div>
-<figure class="w-[90%]">
+<figure class="w-[115%]">
 <img src="/img/tracy.png" alt="Tracy Frame Profiler" />
 <figcaption>A performance capture analysed by the Tracy frame profiler</figcaption>
 </figure>
 </div>
 
 <div>
-<figure class="w-[50%]">
+<figure class="w-[63%]">
 <img src="/img/Debug_Overlay.png" alt="ImGui Debug Overlay">
 <figcaption>The Debug Overlay interface</figcaption>
 </figure>
@@ -1225,19 +1231,19 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 - Some experiments with ECS (unmerged <carbon-branch /> `ecs_old`, 🗓️ Mar)
 - Porting to Emscripten for web support (📰 [Dev Update 11](https://encelo.github.io/2019-07-16-ncine-dev-update-11/))
 - Integration with the [RenderDoc](https://renderdoc.org/) GFX debugger and the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate GUI
-- New hashmap with open addressing and probing (<carbon-commit /> [98f2364d](https://github.com/nCine/nCine/commit/98f2364d), 🗓️ Jan)
+- New hashmap container with open addressing and probing (<carbon-commit /> [98f2364d](https://github.com/nCine/nCine/commit/98f2364d), 🗓️ Jan)
 
 <div grid="~ cols-2">
 
 <div>
-<figure class="w-85">
+<figure class="w-[82%]">
 <img src="/img/DebugOverlay_RenderDoc.png" alt="Debug Overlay, RenderDoc section">
 <figcaption>Integration with the RenderDoc API</figcaption>
 </figure>
 </div>
 
 <div>
-<figure class="w-85">
+<figure class="w-[82%]">
 <img src="/img/apptest_gui.png" alt="apptest_gui">
 <figcaption>
 <a href="https://github.com/nCine/nCine/blob/master/tests/apptest_gui.cpp"><code>apptest_gui</code></a>, Nuklear and ImGui at the same time
@@ -1251,7 +1257,7 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 
 ## 🗓️ 2019 - Broadening the Ecosystem
 
-- `ncIsometric`, a prototype isometric turn-based game that was never released (🗓️ Apr)
+- `ncIsometric`, a prototype of an isometric turn-based game that was never released (🗓️ Apr)
 - `ncInvaders`, my Space Invaders clone with some data-oriented design (🗓️ Jul)
 - `ncTemplate`, a template CMake project to clone and use as a starting point (🗓️ Jul)
 - `ncTracer`, a CPU path-tracer with multi-threading and an ImGui interface (🗓️ Aug)
@@ -1260,7 +1266,7 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
   - Sprite enhancements: non-uniform scaling, anchor points, blending factors (📰 [Dev Update 13](https://encelo.github.io/2019-12-24-ncine-dev-update-13/))
   - The collaboration continues to this day 🫶
 
-<figure class="w-[55%]">
+<figure class="w-[57%]">
 <img src="/img/apptest_anchor.png" alt="apptest_anchor" />
 <figcaption>
 <a href="https://github.com/nCine/nCine/blob/master/tests/apptest_anchor.cpp"><code>apptest_anchor</code></a>, showing sprites rotating around their anchor points
@@ -1268,18 +1274,6 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 </figure>
 
 <!-- The neverending quest for lowering entry barriers. -->
-
----
-
-## 📸 2019 - ncInvaders
-
-- A simplified Space Invaders clone with some Data Oriented Design principles
-  - I adapted part of the code I wrote for the Frostbite technical assignment 😉
-
-<figure class="w-[75%]">
-<img src="/img/ncInvaders.png" alt="ncInvaders" />
-<figcaption><a href="https://github.com/nCine/ncInvaders">ncInvaders</a>, a simplified Space Invaders clone</figcaption>
-</figure>
 
 ---
 
@@ -1291,6 +1285,18 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 <figure class="w-[75%]">
 <img src="/img/ncIsometric.png" alt="ncIsometric" />
 <figcaption>ncIsometric, an isometric turn-based combat prototype</figcaption>
+</figure>
+
+---
+
+## 📸 2019 - ncInvaders
+
+- A simplified Space Invaders clone with some Data Oriented Design principles
+  - I adapted part of the code I wrote for the Frostbite technical assignment 😉
+
+<figure class="w-[75%]">
+<img src="/img/ncInvaders.png" alt="ncInvaders" />
+<figcaption><a href="https://github.com/nCine/ncInvaders">ncInvaders</a>, a simplified Space Invaders clone</figcaption>
 </figure>
 
 ---
@@ -1314,7 +1320,7 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
 - Links nCine statically to bypass symbol visibility and access threads and OpenGL directly
 - 📜 Reference: <a href="https://web.archive.org/web/20210506181127/http://www.raytracegroundup.com/">_Ray Tracing from the Ground Up_</a>
 
-<figure class="w-[70%]">
+<figure class="w-[73%]">
 <img src="/img/ncTracer.png" alt="ncTracer" />
 <figcaption>The classic Cornell box scene as rendered by <a href="https://github.com/encelo/ncTracer">ncTracer</a></figcaption>
 </figure>
@@ -1328,7 +1334,7 @@ SSO, a common optimization also found in <code>std::string</code> (<a href="http
   - The tool included a runtime to load maps in various 2D engines (Cocos2d-x, AGK-tier 2, SFML)
 - His demos really put the nCine under stress 🥵
   - I fixed a lot of bugs and added all the requested features 💪
-- The nCine was the fastest supported engine and was chosen for the web demos on the site
+- The nCine was the fastest supported engine and was chosen for the web demos on the tool site
 
 <br/>
 <div grid="~ cols-4 gap-x-2">
@@ -1627,13 +1633,14 @@ The <code>boundRandom</code> function uses <em>rejection sampling</em> to discar
 - PCG produces uniformly distributed numbers across the full 32-bit range ($0..2^{32}-1$)
 - But if the user requests a smaller range, some numbers need to be rejected to avoid bias
 - Example: RNG that generates numbers 0–11
-  - If we want a range 0–9 and just apply modulo:
-    - 10 maps to 0 and 11 maps to 1, so 0 and 1 occur more often than 2–9
-  - Correct solution: discard 10 and 11, and draw again until the result $< 10$
+  - If we want a range 0–4 and just apply modulo:
+    - $\bmod 5$ buckets: [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], **10**, **11**
+    - 10 maps to 0 and 11 maps to 1, so 0 and 1 occur more often than 2–4
+  - Correct solution: discard 10 and 11, the incomplete bucket, and draw again
 - `boundRandom()` works the same way, but discards from the bottom instead of the top
-  - This is mathematically equivalent, it just makes the implementation simpler
+  - This is mathematically equivalent, but avoids computing the largest multiple of `bound`
   - In the code we read: `const uint32_t threshold = -bound % bound;`
-  - Trick: `-bound` is $2^{32} - \texttt{bound}$, just like `uint32_t(-1)` is $2^{32}-1$ (`UINT_MAX`)
+  - Trick: `-bound` is $2^{32} - \texttt{bound}$, just like `uint32_t(-1)` is $2^{32}-1$ (or `UINT_MAX`)
   - Then `threshold = -bound % bound` = $(2^{32} - b) \bmod b = 2^{32} \bmod b$
   - Exactly the count of leftover values after partitioning $0..2^{32}-1$ into buckets of size `bound`
   - This trick avoids the need to represent $2^{32}$ directly, which does not fit in a `uint32_t`
@@ -1650,7 +1657,7 @@ The <code>boundRandom</code> function uses <em>rejection sampling</em> to discar
   - Allow sprites with no textures, text nodes with no fonts, audio players with no buffers
 - Add support for custom memory allocators (<carbon-commit /> [defb333a](https://github.com/nCine/nCine/commit/defb333a), 📰 [Dev Update 15](https://encelo.github.io/2020-07-14-ncine-dev-update-15/), 🗓️ Apr)
 - Migrated from Azure to GitHub Actions for C.I. (<carbon-commit /> [c370ad59](https://github.com/nCine/nCine/commit/c370ad59), 🗓️ Nov)
-- Didn't get an Epic MegaGrant (🗓️ May), got 250$ for the [Icculus Microgrant 2020](https://icculus.org/microgrant/2020/) (🗓️ Dec)
+- I didn't get an Epic MegaGrant (🗓️ May), but I got 250$ for the [Icculus Microgrant 2020](https://icculus.org/microgrant/2020/) (🗓️ Dec)
 
 <br/>
 <div grid="~ cols-3">
@@ -1696,7 +1703,7 @@ An entry in the nCine GitHub Actions workflow runs <a href="https://github.com/n
 - I tried selling a tool for artists on itch.io, but it didn't gain traction
 - It's now free and open-source on GitHub, with optional donations still available
 
-<figure class="w-[75%]">
+<figure class="w-[77%]">
 <img src="/img/SpookyGhost.png" alt="SpookyGhost" />
 <figcaption>
 <a href="https://encelo.itch.io/spookyghost"><strong>SpookyGhost</strong></a>, a procedural animation tool for 2D sprites
@@ -1705,12 +1712,12 @@ An entry in the nCine GitHub Actions workflow runs <a href="https://github.com/n
 
 <div class="absolute left-3/4 top-1/5">
 
-<figure class="w-[75%]">
+<figure class="w-[79%]">
 <img src="/img/SpookyGhost_laundry.gif" alt="SpookyGhost laundry animation" />
 <figcaption>Laundry animation</figcaption>
 </figure>
 
-<figure class="w-[75%]">
+<figure class="w-[79%]">
 <img src="/img/SpookyGhost_tree.gif" alt="SpookyGhost tree animation" />
 <figcaption>Tree animation</figcaption>
 </figure>
@@ -1723,17 +1730,24 @@ An entry in the nCine GitHub Actions workflow runs <a href="https://github.com/n
 
 - Started in December by [Fahien](https://www.antoniocaggiano.eu/), to demonstrate what nCine could do
 - Uses Box2D for physics and Dear ImGui for on the fly editing
-- Among the first nCine projects successfully tested on the [Steam Deck](https://www.youtube.com/watch?v=ZKdDtJiIUdo)
+- Among the first nCine projects successfully tested on Linux handheld devices
 
 <figure class="w-[70%]">
 <img src="/img/ncJump.png" alt="ncJump" />
 <figcaption><strong>ncJump</strong>, a jumping project powered by nCine 🦘</figcaption>
 </figure>
 
-<div class="absolute left-3/4 top-1/5" style="rotate: 15deg;">
+<div class="absolute left-3/4 top-3/20" style="rotate: 15deg;">
 <figure class="w-[90%]">
 <img src="/img/ncJump_SteamDeck.jpg" alt="ncJump on Steam Deck" />
-<figcaption><strong>ncJump</strong> running on my Steam Deck</figcaption>
+<figcaption><strong>ncJump</strong> <a href="https://www.youtube.com/watch?v=ZKdDtJiIUdo">running</a> on my Steam Deck</figcaption>
+</figure>
+</div>
+
+<div class="absolute left-3/4 top-9/20" style="rotate: 15deg;">
+<figure class="w-[90%]">
+<img src="/img/ncJump_OdroidGoAdvance.png" alt="ncJump on Odroid Go Advance" />
+<figcaption><strong>ncJump</strong> <a href="https://x.com/Fahien/status/1353038480646033409">running</a> on Fahien's Odroid Go Advance</figcaption>
 </figure>
 </div>
 
@@ -1840,7 +1854,7 @@ routeAlias: allocators
   - _Stack_: deallocates only in reverse order (last allocated first)
   - _Pool_: allocates fixed-size blocks, uses a free list for  arbitrary deallocation
   - _Free List_: allocates and deallocates arbitrarily, can defragment adjacent free blocks
-- Many libraries support custom allocators (e.g., SDL2, GLFW, Lua, ImGui, Nuklear, Vulkan)
+- Many libraries support user-provided allocators (e.g., SDL2, GLFW, Lua, ImGui, Nuklear, Vulkan)
 - 📜 Reference: Tiago Sousa's [article](https://gamedev.net/tutorials/programming/general-and-gameplay-programming/c-custom-memory-allocation-r3010/)
 
 <figure>
@@ -1853,10 +1867,13 @@ static AllocManagerInitializer allocManagerInit __attribute__((init_priority(101
 #endif
 ```
 
-<figcaption>Compiler-specific tricks to ensure correct initialization order of global objects</figcaption>
+<figcaption class="left">
+Compiler-specific tricks to ensure correct initialization order of static storage objects (<a href="https://en.cppreference.com/w/cpp/language/siof.html">Static Initialization Order Fiasco</a>).<br/>
+The <code>AllocManager</code> must exist before any static objects that may allocate memory.
+</figcaption>
 </figure>
 
-<!-- I have wired my allocators with all the libraries listed in the slide, except Vulkan. But I will once I add support for it. -->
+<!-- I have wired my allocators with all the libraries listed in the slide, except Vulkan, that will use VMA once I add support for it. -->
 
 ---
 
@@ -1967,6 +1984,7 @@ AllocManager::~AllocManager()
 - Thinking about building an editor... 🤔 (#2)
   - Catch Lua errors with protected calls (📰 [Dev Update 17](https://encelo.github.io/2021-06-28-ncine-dev-update-17/))
 - CMake project files moved inside the nCine distribution
+  - Fixes and updates to project scripts are now centralized
 - Lua oriented binary distribution (<carbon-commit /> [8ad63ad4](https://github.com/nCine/nCine/commit/8ad63ad4), 🗓️ Jul)
 
 <div class="absolute left-3/5 top-2/4">
@@ -1981,7 +1999,7 @@ AllocManager::~AllocManager()
 ## 📸 2021 - ncTiledViewer
 
 - Creating a custom editor from scratch is a lot of work...
-  - Started by simply showing how to load a map from the Tiled editor
+  - But showing how to load a Tiled editor map is far simpler
 - Added chroma key support for texture loading in nCine, required by some levels
 
 <figure class="w-[70%]">
@@ -2006,15 +2024,15 @@ routeAlias: cmake
 
 ## 💊 2021 - CMake Scripts (1/2)
 
-- More than 3600 lines of scripts in `nCine/cmake/`
+- More than 3800 lines of scripts in `nCine/cmake/`
   - Declare the list of public/private headers and sources
-  - Expose a thorough set of compilation options to the user
-  - Find the required and optional dependency libraries
+  - Expose a thorough set of compilation [options](https://github.com/nCine/nCine/wiki/CMake-Options) to the user
+  - Find (and install) the required and optional dependency libraries
   - Add compile definitions for optional features
   - Download ImGui, Nuklear, Tracy, GTest, and GBenchmark sources
   - Build the library, apptests, unit tests, benchmarks, and documentation
   - Build compressed archives, NSIS Windows installers, macOS bundles, Android APKs
-- More than 1600 lines of scripts in `nCine/project/cmake`
+- Nearly 2000 lines of scripts in `nCine/project/cmake`
   - Try to find the nCine library based on the `nCine_DIR` user variable
   - The user can customize some `NCPROJECT_` variables and some CMake callbacks
 
@@ -2071,7 +2089,7 @@ The <code>CMakeLists.txt</code> script from the <a href="https://github.com/nCin
 
 ## 🗓️ 2022 - Split Screen and Post-processing
 
-- Most of this year was spent on making advanced 2D graphics possible
+- Most of the year was spent on making advanced 2D graphics possible
   - Think of custom engine indie games like _Pathway_ from Robotality or _Eastward_ by Pixpil
 - Merged the <carbon-branch /> `viewports` branch (<carbon-commit /> [2fb00a58](https://github.com/nCine/nCine/commit/2fb00a58), 🗓️ Nov 2021 - Jan)
   - Added dirty bits to skip transformation and AABB regeneration (using `nctl::BitSet`)
@@ -2088,7 +2106,7 @@ The <code>CMakeLists.txt</code> script from the <a href="https://github.com/nCin
 ## 📸 2022 - Jazz² Resurrection
 
 - Based on a custom fork of the nCine <carbon-fork />
-  - The author provides me with feedback about the general nCine architecture
+  - The author gave me feedback about the general nCine architecture
 
 <figure class="w-[75%]">
 <img src="/img/jazz2.png" alt="Jazz² Resurrection" />
@@ -2415,9 +2433,12 @@ block-beta
 <figcaption>One thousand stars and counting!</figcaption>
 </figure>
 
+<br/>
+<br/>
+
 <figure class="w-[100%]">
 <img src="/img/LuaAddonManager_nCine.png" alt="nCine Lua addon" />
-<figcaption>nCine among the addons of the LuaLS</figcaption>
+<figcaption>nCine among the LuaLS addons</figcaption>
 </figure>
 </div>
 
@@ -2604,11 +2625,11 @@ Tracy capture of <a href="https://github.com/nCine/nCine/blob/master/tests/appte
 - Industry layoffs finally hit me, currently job-free but time-rich ⏳ (🗓️ Mar)
 - I made an nCine game at the Global Game Jam (🗓️ Jan)
   - I also sponsored the event and gave away an nCine mug as a prize 🍺
-- Tried Google and Reddit advertisement with a very small budget
-- ChatGPT suggested I contact Valve for a collaboration (no reply 😅)
+- Tried Google and Reddit advertisement with a very small budget 📢
 - Updated GitHub [`README.md`](https://github.com/nCine/nCine/blob/master/README.md) with documentation links and screenshots
 - Applied for conferences (Guadalindie in Malaga 👎, and /dev/games in Rome 👍)
 - Switched to introsort for `RenderCommand` sorting (📰 [Dev Update 22](https://encelo.github.io/2025-09-21-ncine-dev-update-22/), 🗓️ Jan)
+- Added [environment variables](https://github.com/nCine/nCine/wiki/AppCfg-EnvVars) to override run-time configuration options (🗓️ Jun)
 - Started signing GitHub commits (with GPG subkeys on a Yubikey 5C NFC, 🗓️ Nov)
 
 </div>
@@ -2713,7 +2734,7 @@ routeAlias: introsort
 template <class Iterator, class Compare>
 inline void sort(Iterator first, Iterator last, Compare comp)
 {
-    const unsigned int maxDepth = log(distance(first, last)) * 2;
+    const unsigned int maxDepth = floor(log2(max(1, distance(first, last)))) * 2;
     introsort(first, last, comp, maxDepth);
 }
 ```
@@ -2803,11 +2824,11 @@ flowchart LR
 - Brainstormed game, business, and collaboration ideas
 - Assisted me in writing a quicksort unit test for nCine
 - Helped me proofread this presentation 👨‍🏫
-  - Wrote bash and Python scripts to create Git activity charts (next slide)
+  - Wrote bash and Python scripts to create Git activity charts
   - Explained how to write custom CSS code for [Slidev](https://sli.dev/)
 - Helped setup the refraction shader in 2D for Wet Paper
+- Today it acts as a secondary code reviewer, catching edge cases and design issues
 
-<br/>
 <div grid="~ cols-2 gap-x-8">
 
 <div>
@@ -2821,6 +2842,49 @@ flowchart LR
 <figure class="w-[100%]">
 <img src="/img/ChatGPT_slidev.png" alt="ChatGPT and introspective sorting" />
 <figcaption>ChatGPT helping me with Slidev</figcaption>
+</figure>
+</div>
+
+</div>
+
+---
+
+## 🗓️ 2026 - Infrastructure and Low-Level Refinement
+
+- Using `alignas(16)` on `Vector4`, `Matrix4x4`, and `Quaternion` to encourage SIMD auto-vectorization
+- Added `nctl::StringView` and `nctl::Optional`, modeled after the STL equivalents
+- Added an option to disable compilation of all scenegraph-related classes
+  - Unblocked initial development of Vulkan wrapper classes 🌋
+- Making Linux and MinGW builds fully self-contained by bundling dependency libraries
+  - On Linux, executables require `RUNPATH` set to `$ORIGIN;$ORIGIN/../lib`
+- GitHub Actions workflows now upload a `manifest.json` file
+  - The website parses it with JavaScript to generate up-to-date download buttons
+
+<div grid="~ cols-2 gap-x-10">
+
+<div>
+<figure>
+
+```cpp
+template <class T>
+explicit Optional<T>::Optional(const T &value)
+    : engaged_(true)
+{
+  new (&storage_) T(value); // placement new
+}
+```
+
+<figcaption class="left">
+Placement new is used to conditionally construct the stored value.<br/>
+Non-trivially destructible types require explicit destruction when <code>reset()</code> is called.
+</figcaption>
+</figure>
+</div>
+
+<div>
+<figure class="w-[100%]">
+<img src="/img/nCine_download.png" alt="Download buttons from nCine site">
+<figcaption>Tooltip data extracted from the corresponding <code>manifest.json</code> file</figcaption>
 </figure>
 </div>
 
@@ -2885,7 +2949,7 @@ flowchart LR
 - But fortunately, that's not the reality
   - I have poured in a lot of time, but I've also learned immensely and enjoyed the journey
   - It might never become my full-time job, and that's fine
-  - Just having more users and watching the project grow is already rewarding
+  - Just having more users and watching the project grow is already rewarding 📈
 
 ---
 
